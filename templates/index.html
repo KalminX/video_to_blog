@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vidlogue</title>
+
+  <!-- Tailwind (you already used it) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Socket.IO client -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <style>
+    /* small helpers */
+    .drop-active {
+      border-color: #0ea5a4;
+      background: rgba(14, 165, 164, 0.03);
+    }
+
+    pre.transcript {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen font-sans">
+
+  <header class="flex justify-between items-center bg-white shadow p-4">
+    <div class="flex items-center">
+      <img src="https://via.placeholder.com/50" alt="Vidlogue Logo" class="mr-3 rounded">
+      <span class="font-bold text-xl">Vidlogue</span>
+    </div>
+
+    <nav class="hidden md:flex space-x-6">
+      <a href="#" class="text-gray-600 hover:text-gray-900">Dashboard</a>
+      <a href="#" class="text-gray-600 hover:text-gray-900">Upload</a>
+      <a href="#" class="text-gray-600 hover:text-gray-900">Articles</a>
+    </nav>
+
+    <div class="flex items-center space-x-4">
+      <img src="https://via.placeholder.com/40" alt="User Avatar" class="rounded-full">
+      <span class="text-gray-600">Kalmin</span>
+      <button class="bg-gray-200 px-3 py-1 rounded text-gray-600">Log out</button>
+    </div>
+  </header>
+
+  <main class="mx-auto p-6 max-w-3xl">
+    <h1 class="mb-6 font-bold text-3xl text-center">Upload Your Video</h1>
+
+    <!-- Upload section -->
+    <section class="bg-white shadow mb-6 p-6 rounded-lg">
+      <div class="gap-6 grid md:grid-cols-2">
+        <!-- Option 1: Drag/drop -->
+        <div>
+          <h2 class="mb-2 font-semibold text-lg">Option 1: Upload File</h2>
+
+          <div id="dropZone"
+            class="p-6 border-2 border-teal-500 border-dashed rounded-lg text-center transition-colors cursor-pointer"
+            tabindex="0">
+            <input id="fileInput" type="file" accept="audio/*,video/*" class="hidden" />
+            <p id="dropText" class="text-gray-600">Drag & drop your video here, or click to select</p>
+            <div class="mt-4">
+              <img src="https://via.placeholder.com/160x90" alt="Upload Icon" class="mx-auto" />
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <button id="uploadBtn" class="bg-teal-500 disabled:opacity-60 px-4 py-2 rounded text-white" disabled>
+              Upload & Transcribe
+            </button>
+            <button id="clearBtn" class="ml-2 px-4 py-2 border rounded" type="button">Clear</button>
+          </div>
+        </div>
+
+        <!-- Option 2: YT Link (UI only) -->
+        <div>
+          <h2 class="mb-2 font-semibold text-lg">Option 2: YouTube Link</h2>
+          <div class="flex items-center space-x-3">
+            <input id="ytLink" type="text" placeholder="Enter your YouTube URL (coming soon)"
+              class="flex-1 p-2 border border-gray-300 rounded" disabled />
+            <button class="bg-gray-300 px-4 py-2 rounded text-gray-700" disabled>Upload</button>
+          </div>
+          <p class="mt-2 text-gray-500 text-sm">YouTube ingestion is not enabled in this demo — paste a link to enable
+            in the backend.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progress + transcript -->
+    <section class="bg-white shadow p-6 rounded-lg">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <h3 class="font-semibold text-lg">Processing</h3>
+          <p id="stageText" class="text-gray-500 text-sm">No task started</p>
+        </div>
+        <div class="flex items-center space-x-3">
+          <a id="downloadBtn" class="hidden bg-indigo-600 px-3 py-2 rounded text-white" href="#" download>Download
+            Transcript</a>
+          <button id="cancelBtn" class="hidden px-3 py-2 border rounded">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Progress bar (upload + server) -->
+      <div class="mb-3">
+        <div class="mb-1 text-gray-600 text-sm">Upload / Processing progress</div>
+        <div class="bg-gray-200 rounded-full w-full h-4 overflow-hidden">
+          <div id="progressBar" class="bg-teal-500 w-0 h-4 transition-all"></div>
+        </div>
+        <div class="flex justify-between mt-1 text-gray-500 text-xs">
+          <span id="progressLabel">0%</span>
+          <span id="statusLabel">idle</span>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="mb-2 font-medium text-gray-700 text-sm">Live Transcript</h4>
+        <pre id="transcript"
+          class="bg-gray-900 p-4 rounded-lg max-h-72 overflow-y-auto font-mono text-green-300 text-sm transcript"></pre>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white mt-8 p-6 border-t">
+    <div class="mx-auto max-w-3xl text-gray-600 text-sm text-center">
+      <div class="flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+          <img src="https://via.placeholder.com/50" alt="logo" class="rounded">
+          <div>
+            <div class="font-semibold">VIDEO TO BLOG</div>
+            <div>VIDLOGUE</div>
+          </div>
+        </div>
+        <div>© 2025 Vidlogue</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Script: Upload + Socket.IO logic -->
+  <script>
+    (function () {
+      const socket = io();
+
+      // Elements
+      const dropZone = document.getElementById('dropZone');
+      const fileInput = document.getElementById('fileInput');
+      const uploadBtn = document.getElementById('uploadBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const progressBar = document.getElementById('progressBar');
+      const progressLabel = document.getElementById('progressLabel');
+      const statusLabel = document.getElementById('statusLabel');
+      const stageText = document.getElementById('stageText');
+      const transcriptEl = document.getElementById('transcript');
+      const downloadBtn = document.getElementById('downloadBtn');
+
+      let selectedFile = null;
+      let currentTaskId = null;
+      let processing = false;
+
+      // helpers
+      function setProgress(percent, statusMsg) {
+        progressBar.style.width = (percent || 0) + '%';
+        progressLabel.textContent = (percent || 0) + '%';
+        statusLabel.textContent = statusMsg || '';
+      }
+
+      function resetUI() {
+        selectedFile = null;
+        currentTaskId = null;
+        processing = false;
+        fileInput.value = '';
+        uploadBtn.disabled = true;
+        dropZone.classList.remove('drop-active');
+        setProgress(0, 'idle');
+        stageText.textContent = 'No task started';
+        transcriptEl.textContent = '';
+        downloadBtn.classList.add('hidden');
+        downloadBtn.href = '#';
+      }
+
+      // drag & drop + click
+      dropZone.addEventListener('click', () => fileInput.click());
+      dropZone.addEventListener('dragenter', e => { e.preventDefault(); dropZone.classList.add('drop-active'); });
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drop-active'); });
+      dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('drop-active'); });
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drop-active');
+        const f = e.dataTransfer.files && e.dataTransfer.files[0];
+        if (f) selectFile(f);
+      });
+
+      fileInput.addEventListener('change', (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (f) selectFile(f);
+      });
+
+      clearBtn.addEventListener('click', resetUI);
+
+      function selectFile(file) {
+        selectedFile = file;
+        uploadBtn.disabled = false;
+        stageText.textContent = `Ready to upload: ${file.name}`;
+      }
+
+      // Upload using XHR so we can show upload progress
+      uploadBtn.addEventListener('click', () => {
+        if (!selectedFile || processing) return;
+        processing = true;
+        uploadBtn.disabled = true;
+
+        const form = new FormData();
+        form.append('file', selectedFile);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload', true);
+
+        xhr.upload.onprogress = (ev) => {
+          if (ev.lengthComputable) {
+            // show upload progress scaled to 0..40% (server processing will use 40..100)
+            const upPct = Math.round((ev.loaded / ev.total) * 40);
+            setProgress(upPct, 'Uploading...');
+            stageText.textContent = `Uploading: ${upPct}%`;
+          }
+        };
+
+        xhr.onerror = () => {
+          setProgress(0, 'Upload failed');
+          processing = false;
+          uploadBtn.disabled = false;
+        };
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const res = JSON.parse(xhr.responseText || '{}');
+            if (res.task_id) {
+              currentTaskId = res.task_id;
+              setProgress(40, 'Upload complete — waiting for server');
+              stageText.textContent = 'Upload complete — starting processing';
+              transcriptEl.textContent = '';
+            } else {
+              setProgress(0, 'Upload failed (no task id)');
+              processing = false;
+              uploadBtn.disabled = false;
+            }
+          } else {
+            setProgress(0, 'Upload error');
+            processing = false;
+            uploadBtn.disabled = false;
+          }
+        };
+
+        xhr.send(form);
+      });
+
+      // Socket.IO updates from server
+      socket.on('connect', () => {
+        console.log('socket connected');
+      });
+
+      socket.on('progress', (data) => {
+        // Only handle messages for the current task
+        if (!currentTaskId || data.task_id !== currentTaskId) return;
+
+        // update stage text and server percent
+        const pct = typeof data.percent === 'number' ? data.percent : 0;
+        // map server percent (0..100) to progress UI range 40..100 (since upload used 0..40)
+        const mappedPct = Math.round(40 + (pct * 60 / 100));
+        setProgress(mappedPct, `${data.stage}: ${data.message}`);
+        stageText.textContent = `${data.stage} — ${data.message}`;
+
+        // If the backend sends a text_chunk, append it
+        if (data.text_chunk) {
+          transcriptEl.textContent += (data.text_chunk.trim() ? data.text_chunk + "\n\n" : "");
+          transcriptEl.scrollTop = transcriptEl.scrollHeight;
+        }
+
+        // If done, enable download button
+        if (data.stage === 'done' || mappedPct >= 100) {
+          setProgress(100, 'Completed');
+          downloadBtn.classList.remove('hidden');
+          // point to download route on server (assumes /download/<task_id> exists)
+          downloadBtn.href = `/download/${currentTaskId}`;
+        }
+      });
+
+      socket.on('disconnect', () => {
+        console.log('socket disconnected');
+      });
+
+      // initialize UI
+      resetUI();
+    })();
+  </script>
+</body>
+
+</html>

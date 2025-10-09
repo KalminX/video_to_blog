@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-4">
+    <h1 class="font-bold text-2xl">Your Content</h1>
+    <a href="{{ url_for('upload') }}" class="bg-red-600 px-4 py-2 rounded text-white">Upload new Video</a>
+</div>
+
+<div class="space-y-4">
+    {% if videos %}
+    {% for video in videos %}
+    <div class="flex items-center bg-gray-200 p-4 rounded">
+        {% if video.thumbnail_path %}
+        <img src="{{ url_for('thumbnails', filename=video.thumb_filename) }}" alt="Video Thumbnail"
+            class="mr-4 rounded-lg w-32 h-24 object-cover">
+        {% else %}
+        <img src="https://via.placeholder.com/120" alt="Video Thumbnail" class="mr-4 w-32 h-24">
+        {% endif %}
+
+        <div class="flex-1">
+            <h2 class="font-semibold text-lg">{{ video.filename }}</h2>
+            <p class="text-gray-600 text-sm">
+                Uploaded on {{ video.created_at.strftime("%b %d, %Y") if video.created_at else "Unknown date" }}
+            </p>
+        </div>
+        <div class="space-x-2">
+            {% if video.article_path %}
+            <a href="{{ url_for('article', video_id=video.id) }}" class="bg-teal-500 px-4 py-2 rounded text-white">View
+                Article</a>
+            <a href="{{ url_for('download_article', video_id=video.id) }}"
+                class="bg-blue-500 px-4 py-2 rounded text-white">Download Article</a>
+            {% endif %}
+
+            {% if video.transcript_path %}
+            <a href="{{ url_for('download', video_id=video.id) }}"
+                class="bg-red-500 px-4 py-2 rounded text-white">Download Transcript</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <p class="text-gray-600 text-center">No videos uploaded yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

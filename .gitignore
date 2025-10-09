@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv/
+venv/
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+*.sqlite3
+
+# Flask
+instance/
+*.db
+*.sqlite
+*.log
+
+# SocketIO / uploads
+uploads/
+chunks/
+transcripts/
+*.pid
+
+# Node / front-end
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+*.bak
+*.swp
+*.tmp
+
+whisper.cpp
+transcripts
+uploads
+articles
+yt_downloads
+client*
+output*
+*.wav

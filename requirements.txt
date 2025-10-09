@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+Flask-Login
+Authlib
+python-dotenv
+Flask-SocketIO
+eventlet
+python-dotenv
+werkzeug

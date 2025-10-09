@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{{ title or "Vidlogue" }}</title>
+
+    <!-- Tailwind & Socket -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/article.css') }}">
+</head>
+
+<body class="bg-gradient-to-br from-indigo-50 via-rose-50 to-sky-50 text-gray-900 antialiased">
+    {% include 'navbar.html' %}
+
+    <main class="mx-auto p-6 md:p-10 max-w-5xl">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include 'footer.html' %}
+</body>
+
+</html>
