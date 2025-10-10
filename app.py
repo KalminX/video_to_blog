@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_socketio import SocketIO  # noqa: E402
+from flask_socketio import SocketIO
 from dotenv import load_dotenv
 from models import db, Video
 from transcribe import process_audio_task
@@ -25,7 +25,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).parent.resolve()
 UPLOAD_DIR = BASE_DIR / "uploads"
 TRANSCRIPTS_DIR = BASE_DIR / "transcripts"
-ARTICLES_DIR = BASE_DIR / "articles"  # New directory
+ARTICLES_DIR = BASE_DIR / "articles"
 UPLOAD_DIR.mkdir(exist_ok=True)
 TRANSCRIPTS_DIR.mkdir(exist_ok=True)
 ARTICLES_DIR.mkdir(exist_ok=True)
@@ -55,14 +55,7 @@ login_manager, oauth, google = init_auth(app)
 # -----------------------
 # Background transcription function
 # -----------------------
-# -----------------------
-# Background transcription function
-# -----------------------
 def _background_transcribe(task_id, file_path, video_db_id, sid=None, metadata=None):
-    """
-    Runs transcription, article generation, and thumbnail extraction in background.
-    Optional `metadata` is used for YouTube videos.
-    """
     with app.app_context():
 
         def emit_fn(task_id, stage, message, percent=0, text_chunk=None, download_url=None, article_url=None):
@@ -82,7 +75,6 @@ def _background_transcribe(task_id, file_path, video_db_id, sid=None, metadata=N
             print(f"[EMIT] Sending progress event: {payload}, SID: {sid or 'broadcast'}")
 
         try:
-            # Run the main processing pipeline
             out_path, full_text, article_path, article_content, thumbnail_path = process_audio_task(
                 task_id,
                 file_path,
@@ -90,7 +82,6 @@ def _background_transcribe(task_id, file_path, video_db_id, sid=None, metadata=N
                 video_id=video_db_id
             )
 
-            # Update Video DB record
             video = db.session.get(Video, video_db_id)
             if video:
                 video.transcript = full_text or ""
@@ -101,12 +92,12 @@ def _background_transcribe(task_id, file_path, video_db_id, sid=None, metadata=N
                 if metadata:
                     video.video_metadata = json.dumps(metadata)
                 db.session.commit()
-                emit_fn(task_id, "db", "Video updated in database with transcript, article, thumbnail, and metadata", 98)
+                emit_fn(task_id, "db", "Video updated in database", 98)
 
             emit_fn(
                 task_id,
                 "finished",
-                "Transcription, article generation, and thumbnail extraction finished",
+                "Transcription and article generation finished",
                 100,
                 download_url=f"/download/{video_db_id}",
                 article_url=f"/article/{video_db_id}"
@@ -115,7 +106,6 @@ def _background_transcribe(task_id, file_path, video_db_id, sid=None, metadata=N
         except Exception as e:
             emit_fn(task_id, "error", f"Transcription failed: {e}", 100)
             print(f"[ERROR] Background transcription failed: {e}")
-
 
 # -----------------------
 # Routes
@@ -129,7 +119,15 @@ with app.app_context():
     db.create_all()
 
 # -----------------------
-# Run app with SocketIO + Eventlet
+# Run app with SocketIO + Eventlet + reloader
 # -----------------------
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+    # Enable Eventlet auto-reload using 'use_reloader=True'
+    # but Flask debug must be True
+    socketio.run(
+        app,
+        host="0.0.0.0",
+        port=5000,
+        debug=True,
+        use_reloader=True  # <-- auto reload on code changes
+    )

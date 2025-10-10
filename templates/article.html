@@ -2,32 +2,6 @@
 
 {% block content %}
 <div class="article-container">
-    <div class="header">
-        <h1>✨ Your Generated Article</h1>
-
-        <div class="flex flex-wrap gap-3">
-            <button onclick="navigator.clipboard.writeText(`{{ video.article | escape }}`)" class="btn btn-copy">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-2 8h4a2 2 0 002-2v-4a2 2 0 00-2-2h-4m-4 8V8a2 2 0 012-2h4" />
-                </svg>
-                Copy Markdown
-            </button>
-
-            <a href="/download-article/{{ video.id }}" class="btn btn-download">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4" />
-                </svg>
-                Download (.md)
-            </a>
-        </div>
-    </div>
-
-    <hr class="divider">
-
     <article class="markdown-body prose prose-lg prose-indigo">
         {{ article_html | safe }}
     </article>

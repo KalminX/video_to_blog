@@ -1,54 +1,63 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="bg-white shadow mx-auto p-6 rounded-lg max-w-4xl">
-    <h1 class="mb-6 font-bold text-3xl text-center">Upload Audio/Video</h1>
+<div class="mx-auto px-4 py-6 container">
+    <div class="bg-white shadow-lg mx-auto p-6 rounded-lg max-w-4xl">
+        <h1 class="mb-6 font-bold text-3xl md:text-4xl text-center">Upload Audio/Video</h1>
 
-    <div class="gap-6 grid md:grid-cols-2">
-        <!-- File Upload Section -->
-        <div>
-            <h2 class="mb-2 font-semibold text-lg">Upload File</h2>
-            <div id="dropZone" class="p-6 border-2 border-teal-500 border-dashed rounded-lg text-center cursor-pointer">
-                <input id="fileInput" type="file" accept="audio/*,video/*" class="hidden" />
-                <p id="dropText" class="text-gray-600">Drag & drop here or click to select a file</p>
+        <div class="gap-6 grid md:grid-cols-2">
+            <!-- File Upload Section -->
+            <div>
+                <h2 class="mb-4 font-semibold text-lg md:text-xl">Upload File</h2>
+                <div id="dropZone"
+                    class="hover:bg-teal-50 p-6 border-2 border-teal-500 border-dashed rounded-lg text-center transition duration-200 cursor-pointer">
+                    <input id="fileInput" type="file" accept="audio/*,video/*" class="hidden" />
+                    <p id="dropText" class="text-gray-600">Drag & drop or click to select a file</p>
+                </div>
+                <div class="flex md:flex-row flex-col gap-4 mt-4">
+                    <button id="uploadBtn"
+                        class="bg-teal-500 hover:bg-teal-600 disabled:opacity-60 px-4 py-2 rounded-lg w-full md:w-auto text-white transition duration-200"
+                        disabled>Upload & Transcribe</button>
+                    <button id="clearBtn"
+                        class="bg-white hover:bg-gray-100 px-4 py-2 border border-gray-300 rounded-lg w-full md:w-auto text-gray-700 transition duration-200">Clear</button>
+                </div>
             </div>
-            <div class="flex gap-2 mt-4">
-                <button id="uploadBtn" class="bg-teal-500 disabled:opacity-60 px-4 py-2 rounded text-white"
-                    disabled>Upload & Transcribe</button>
-                <button id="clearBtn" class="px-4 py-2 border rounded" type="button">Clear</button>
 
+            <!-- YouTube Upload Section -->
+            <div>
+                <h2 class="mb-4 font-semibold text-lg md:text-xl">YouTube URL</h2>
+                <div class="flex md:flex-row flex-col gap-4">
+                    <input id="youtubeInput" type="text"
+                        class="flex-1 p-2 border border-gray-300 focus:border-transparent rounded-lg focus:ring-2 focus:ring-teal-500"
+                        placeholder="Enter YouTube URL">
+                    <button id="youtubeUploadBtn"
+                        class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-lg w-full md:w-auto text-white transition duration-200">Upload</button>
+                </div>
             </div>
         </div>
 
-        <!-- YouTube Upload Section -->
-        <div>
-            <h2 class="mb-2 font-semibold text-lg">YouTube URL</h2>
-            <div class="flex items-center gap-2">
-                <input id="youtubeInput" type="text" class="flex-1 p-2 border rounded" placeholder="Enter YouTube URL">
-                <button id="youtubeUploadBtn" class="bg-teal-500 px-4 py-2 rounded text-white">Upload</button>
+        <!-- Progress Bar & Live Transcript -->
+        <div class="mt-6">
+            <div class="flex justify-between items-center mb-2">
+                <div id="stageText" class="text-gray-600 text-sm md:text-base">Idle</div>
+                <a id="downloadBtn" href="#" target="_blank"
+                    class="hidden bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-lg text-white transition duration-200">Download
+                    Transcript</a>
             </div>
-        </div>
-    </div>
+            <div class="bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                <div id="progressBar" class="bg-teal-500 rounded-full h-2.5 transition-all duration-300"
+                    style="width: 0%;"></div>
+            </div>
+            <div class="flex justify-between mt-1 text-gray-500 text-xs md:text-sm">
+                <span id="progressLabel">0%</span>
+                <span id="statusLabel">idle</span>
+            </div>
 
-    <!-- Progress Bar & Live Transcript -->
-    <div class="mt-6">
-        <div class="flex justify-between mb-2">
-            <div id="stageText" class="text-gray-600 text-sm">Idle</div>
-            <a id="downloadBtn" href="#" target="_blank"
-                class="hidden bg-indigo-600 px-3 py-2 rounded text-white">Download Transcript</a>
-        </div>
-        <div class="bg-gray-200 rounded-full w-full h-4 overflow-hidden">
-            <div id="progressBar" class="bg-teal-500 w-0 h-4 transition-all"></div>
-        </div>
-        <div class="flex justify-between mt-1 text-gray-500 text-xs">
-            <span id="progressLabel">0%</span>
-            <span id="statusLabel">idle</span>
-        </div>
-
-        <div class="mt-4">
-            <h4 class="mb-2 font-medium text-gray-700 text-sm">Live Transcript</h4>
-            <pre id="transcript"
-                class="bg-gray-900 p-4 rounded-lg max-h-72 overflow-y-auto font-mono text-green-300 text-sm"></pre>
+            <div class="mt-6">
+                <h4 class="mb-2 font-medium text-gray-700 text-sm md:text-base">Live Transcript</h4>
+                <pre id="transcript"
+                    class="bg-gray-900 p-4 rounded-lg max-h-60 md:max-h-72 overflow-y-auto font-mono text-green-300 text-sm"></pre>
+            </div>
         </div>
     </div>
 </div>
@@ -210,7 +219,7 @@
                 if (!articleBtn) {
                     articleBtn = document.createElement('a');
                     articleBtn.id = 'articleBtn';
-                    articleBtn.className = 'bg-indigo-600 px-3 py-2 rounded text-white ml-2';
+                    articleBtn.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition duration-200 ml-2';
                     articleBtn.target = '_blank';
                     articleBtn.textContent = 'View Article';
                     downloadBtn.insertAdjacentElement('afterend', articleBtn);

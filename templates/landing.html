@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex flex-col justify-center items-center bg-white p-4 min-h-screen text-gray-900">
+    <div class="px-4 max-w-2xl text-center">
+        <h1 class="mb-4 font-bold text-4xl md:text-5xl">Turn Your Videos into Blogs in Minutes</h1>
+                <img src="{{ url_for('static', filename='images/main_image.png') }}" alt="Youtube Transcription pic" class="">
+        <p class="mb-6 text-gray-600 text-lg">Easily transform your video content into polished blog posts with our
+            AI-powered tool. Upload a video or YouTube link and get a shareable blog instantly.</p>
+        <div class="space-x-4 mb-8">
+            <button class="bg-indigo-600 hover:bg-indigo-700 px-6 py-3 rounded-lg text-white">Get Started Free</button>
+            <button class="bg-gray-200 hover:bg-gray-300 px-6 py-3 rounded-lg text-gray-800">Learn More</button>
+        </div>
+    </div>
+    <div class="bg-gray-100 py-12 w-full">
+        <div class="mx-auto px-4 max-w-4xl text-center">
+            <h2 class="mb-6 font-semibold text-2xl md:text-3xl">Why Choose Us</h2>
+            <div class="gap-6 grid grid-cols-1 md:grid-cols-4">
+                <div class="p-4">
+                    <div class="flex justify-center items-center bg-indigo-100 mx-auto mb-3 rounded-full w-12 h-12">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-lg">Upload Anywhere</h3>
+                    <p class="text-gray-600">Support for videos and YouTube links.</p>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-center items-center bg-indigo-100 mx-auto mb-3 rounded-full w-12 h-12">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-lg">Smart Drafts</h3>
+                    <p class="text-gray-600">AI-generated blog drafts in seconds.</p>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-center items-center bg-indigo-100 mx-auto mb-3 rounded-full w-12 h-12">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7h12m0 0l-4-4m4 4l-4 4m-4 0H4m0 0l4-4m-4 4l4 4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-lg">AI Transcription</h3>
+                    <p class="text-gray-600">Accurate and fast transcription technology.</p>
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-center items-center bg-indigo-100 mx-auto mb-3 rounded-full w-12 h-12">
+                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-medium text-lg">Easy Export</h3>
+                    <p class="text-gray-600">Export or copy your blogs effortlessly.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-12 text-center">
+        <img src="https://via.placeholder.com/800x400?text=Video+to+Blog" alt="Video to Blog Demo"
+            class="shadow-lg rounded-lg">
+    </div>
+</div>
+{% endblock %}

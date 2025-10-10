@@ -14,13 +14,17 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/article.css') }}">
 </head>
 
-<body class="bg-gradient-to-br from-indigo-50 via-rose-50 to-sky-50 text-gray-900 antialiased">
+<body class="flex flex-col bg-gradient-to-br from-indigo-50 via-rose-50 to-sky-50 h-screen text-gray-900 antialiased">
+
+    <!-- Navbar (fixed at top) -->
     {% include 'navbar.html' %}
 
-    <main class="mx-auto p-6 md:p-10 max-w-5xl">
+    <!-- Main (scrollable center section) -->
+    <main class="flex-1 mx-auto p-6 md:p-10 w-full max-w-5xl overflow-y-auto">
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Footer (fixed at bottom) -->
     {% include 'footer.html' %}
 </body>
 

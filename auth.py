@@ -30,11 +30,11 @@ def init_auth(app):
         return db.session.get(User, user_id)
 
     # Authentication routes
-    @app.route("/")
-    def index():
-        if current_user.is_authenticated:
-            return redirect(url_for("upload"))
-        return render_template("login.html")
+    # @app.route("/")
+    # def index():
+    #     if current_user.is_authenticated:
+    #         return redirect(url_for("upload"))
+    #     return render_template("login.html")
 
     @app.route("/login")
     def login():

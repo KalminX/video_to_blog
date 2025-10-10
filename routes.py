@@ -67,6 +67,11 @@ def init_routes(app, socketio, UPLOAD_DIR: Path, ALLOWED_EXTENSIONS: set, BASE_D
 
     def allowed_file(filename: str) -> bool:
         return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    
+
+    @app.route('/')
+    def landing_page():
+        return render_template('landing.html') 
 
     @app.route("/upload", methods=["GET"])
     @login_required
@@ -216,17 +221,18 @@ def init_routes(app, socketio, UPLOAD_DIR: Path, ALLOWED_EXTENSIONS: set, BASE_D
     @app.route("/dashboard")
     @login_required
     def dashboard():
-        videos = Video.query.filter_by(user_id=current_user.id).order_by(Video.created_at.desc()).all()
+        page = request.args.get('page', 1, type=int)
+        per_page = 5  # Number of videos per page
+        videos = Video.query.filter_by(user_id=current_user.id).order_by(Video.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
         
         # Add just the thumbnail filename for the template
-        for v in videos:
+        for v in videos.items:  # Use videos.items to access the paginated list
             if v.thumbnail_path:
                 v.thumb_filename = os.path.basename(v.thumbnail_path)
             else:
                 v.thumb_filename = None
 
-        return render_template("dashboard.html", videos=videos)
-
+        return render_template("dashboard.html", videos=videos, page=page)
 
     @app.route("/download/<int:video_id>")
     @login_required

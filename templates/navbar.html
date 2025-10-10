@@ -1,12 +1,14 @@
-<header class="bg-white shadow p-4">
-    <div class="flex justify-between items-center">
-        <!-- Logo + Name -->
-        <div class="flex items-center">
-            <img src="https://via.placeholder.com/50" class="mr-3 rounded" alt="logo">
-            <span class="font-bold text-xl">Vidlogue</span>
+<header class="top-0 z-50 sticky bg-white shadow p-4">
+    <div class="flex justify-between items-center mx-auto max-w-6xl container">
+        <!-- Logo -->
+        <div class="flex items-center space-x-2">
+            <a href="{{ url_for('landing_page') }}" class="flex items-center space-x-2">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Vidlogue Logo" class="h-12">
+                <span class="font-semibold text-gray-800 text-xl">Vidlogue</span>
+            </a>
         </div>
 
-        <!-- Hamburger button (mobile) -->
+        <!-- Hamburger (Mobile) -->
         <button id="menu-toggle" class="md:hidden focus:outline-none text-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24"
                 stroke="currentColor">
@@ -14,27 +16,29 @@
             </svg>
         </button>
 
-        <!-- Desktop Nav + Profile -->
-        <div class="hidden md:flex items-center space-x-6">
-            <nav class="space-x-4">
-                <a href="{{ url_for('upload') }}" class="text-gray-600 hover:text-gray-900">Upload</a>
-                {% if current_user.is_authenticated %}
-                <a href="#" class="text-gray-600 hover:text-gray-900">My Videos</a>
-                <a href="{{ url_for('dashboard') }}" class="text-gray-600 hover:text-gray-900">Dashboard</a>
-                {% endif %}
-            </nav>
+        <!-- Desktop Nav -->
+        <nav class="hidden md:flex items-center space-x-8 font-medium text-gray-700">
+            <a href="{{ url_for('landing_page') }}" class="hover:text-teal-600 transition">Home</a>
+            <a href="{{ url_for('upload') }}" class="hover:text-teal-600 transition">Upload</a>
+            {% if current_user.is_authenticated %}
+            <a href="{{ url_for('dashboard') }}" class="hover:text-teal-600 transition">Dashboard</a>
+            {% endif %}
+        </nav>
 
+        <!-- Profile / Auth -->
+        <div class="hidden md:flex items-center space-x-4">
             {% if current_user.is_authenticated %}
             <div class="flex items-center space-x-3">
                 <img src="{{ current_user.picture }}" class="rounded-full w-10 h-10" alt="avatar">
-                <span class="text-gray-600">{{ current_user.name }}</span>
-                <a href="{{ url_for('logout') }}" class="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded transition">
+                <span class="text-gray-700">{{ current_user.name }}</span>
+                <a href="{{ url_for('logout') }}"
+                    class="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-gray-700 transition">
                     Logout
                 </a>
             </div>
             {% else %}
             <a href="{{ url_for('login') }}"
-                class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white transition">
+                class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded font-medium text-white transition">
                 Sign in with Google
             </a>
             {% endif %}
@@ -42,20 +46,22 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden flex-col space-y-3 mt-4">
-        <a href="{{ url_for('upload') }}" class="block text-gray-700 hover:text-gray-900">Upload</a>
+    <div id="mobile-menu" class="hidden md:hidden flex-col space-y-3 mt-4 text-center">
+        <a href="{{ url_for('landing_page') }}" class="block text-gray-700 hover:text-teal-600 transition">Home</a>
+        <a href="{{ url_for('upload') }}" class="block text-gray-700 hover:text-teal-600 transition">Upload</a>
         {% if current_user.is_authenticated %}
-        <a href="#" class="block text-gray-700 hover:text-gray-900">My Videos</a>
-        <div class="flex items-center space-x-3">
+        <a href="{{ url_for('dashboard') }}" class="block text-gray-700 hover:text-teal-600 transition">Dashboard</a>
+        <div class="flex justify-center items-center space-x-3">
             <img src="{{ current_user.picture }}" class="rounded-full w-10 h-10" alt="avatar">
-            <span class="text-gray-600">{{ current_user.name }}</span>
-            <a href="{{ url_for('logout') }}" class="bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded transition">
-                Logout
-            </a>
+            <span class="text-gray-700">{{ current_user.name }}</span>
         </div>
+        <a href="{{ url_for('logout') }}"
+            class="bg-gray-200 hover:bg-gray-300 mx-auto px-3 py-1 rounded w-max text-gray-700 transition">
+            Logout
+        </a>
         {% else %}
         <a href="{{ url_for('login') }}"
-            class="block bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded text-white text-center transition">
+            class="block bg-teal-500 hover:bg-teal-600 mx-auto px-4 py-2 rounded w-max text-white text-center transition">
             Sign in with Google
         </a>
         {% endif %}
