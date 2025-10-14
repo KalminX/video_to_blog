@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mx-auto px-4 py-10 max-w-2xl container">
+    <div class="bg-white shadow-lg p-8 rounded-2xl">
+        <h1 class="mb-6 font-bold text-gray-800 text-3xl text-center">Buy Credits</h1>
+        <p class="mb-6 text-gray-600 text-center">
+            💡 <strong>1 Credit = 1 Minute</strong> of processing time
+        </p>
+        <p class="mb-8 text-gray-500 text-sm text-center">
+            Each credit costs <strong>$0.20</strong>
+        </p>
+
+        <form id="paymentForm" class="space-y-5">
+            <div>
+                <label for="amount" class="block mb-2 font-medium text-gray-700">Select Credits:</label>
+                <select id="amount"
+                    class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 w-full">
+                    <option value="5">5 Credits - $1.00</option>
+                    <option value="10">10 Credits - $2.00</option>
+                    <option value="20">20 Credits - $4.00</option>
+                    <option value="50">50 Credits - $10.00</option>
+                </select>
+            </div>
+
+            <button type="submit"
+                class="bg-teal-500 hover:bg-teal-600 px-4 py-3 rounded-lg w-full font-semibold text-white transition duration-200">
+                <span id="buttonText">Pay Now</span>
+                <svg id="loadingSpinner" class="hidden inline-block ml-2 w-5 h-5 text-white animate-spin"
+                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                </svg>
+            </button>
+        </form>
+
+        <!-- Success / Error Message -->
+        <div id="paymentMessage" class="mt-6 font-medium text-base text-center"></div>
+    </div>
+</div>
+
+<script>
+    const paymentForm = document.getElementById("paymentForm");
+    const paymentMessage = document.getElementById("paymentMessage");
+    const buttonText = document.getElementById("buttonText");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+
+    paymentForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const credits = parseInt(document.getElementById("amount").value);
+        paymentMessage.innerHTML = "";
+        buttonText.textContent = "Processing...";
+        loadingSpinner.classList.remove("hidden");
+
+        try {
+            const res = await fetch("{{ url_for('buy_credits') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ credits })
+            });
+
+            const data = await res.json();
+            loadingSpinner.classList.add("hidden");
+            buttonText.textContent = "Pay Now";
+
+            if (res.ok && data.authorization_url) {
+                // Redirect to Paystack checkout page
+                window.location.href = data.authorization_url;
+            } else {
+                paymentMessage.innerHTML = `
+                    <div class="bg-red-100 px-4 py-3 border border-red-400 rounded-lg text-red-700">
+                        ❌ Payment failed: ${data.error || "Could not initialize payment. Please try again."}
+                    </div>
+                `;
+            }
+        } catch (err) {
+            console.error(err);
+            loadingSpinner.classList.add("hidden");
+            buttonText.textContent = "Pay Now";
+            paymentMessage.innerHTML = `
+                <div class="bg-red-100 px-4 py-3 border border-red-400 rounded-lg text-red-700">
+                    ⚠️ Payment failed. Please check your internet connection and try again.
+                </div>
+            `;
+        }
+    });
+</script>
+
+{% endblock %}

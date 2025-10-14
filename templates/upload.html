@@ -17,7 +17,7 @@
                 <div class="flex md:flex-row flex-col gap-4 mt-4">
                     <button id="uploadBtn"
                         class="bg-teal-500 hover:bg-teal-600 disabled:opacity-60 px-4 py-2 rounded-lg w-full md:w-auto text-white transition duration-200"
-                        disabled>Upload & Transcribe</button>
+                        disabled>Start Processing</button>
                     <button id="clearBtn"
                         class="bg-white hover:bg-gray-100 px-4 py-2 border border-gray-300 rounded-lg w-full md:w-auto text-gray-700 transition duration-200">Clear</button>
                 </div>
@@ -31,18 +31,19 @@
                         class="flex-1 p-2 border border-gray-300 focus:border-transparent rounded-lg focus:ring-2 focus:ring-teal-500"
                         placeholder="Enter YouTube URL">
                     <button id="youtubeUploadBtn"
-                        class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-lg w-full md:w-auto text-white transition duration-200">Upload</button>
+                        class="bg-teal-500 hover:bg-teal-600 px-4 py-2 rounded-lg w-full md:w-auto text-white transition duration-200">Start
+                        Processing</button>
                 </div>
             </div>
         </div>
 
-        <!-- Progress Bar & Live Transcript -->
+        <!-- Progress Bar & Live Output -->
         <div class="mt-6">
             <div class="flex justify-between items-center mb-2">
-                <div id="stageText" class="text-gray-600 text-sm md:text-base">Idle</div>
+                <div id="stageText" class="text-gray-600 text-sm md:text-base">Waiting for input</div>
                 <a id="downloadBtn" href="#" target="_blank"
                     class="hidden bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-lg text-white transition duration-200">Download
-                    Transcript</a>
+                    Output</a>
             </div>
             <div class="bg-gray-200 rounded-full h-2.5 overflow-hidden">
                 <div id="progressBar" class="bg-teal-500 rounded-full h-2.5 transition-all duration-300"
@@ -54,7 +55,7 @@
             </div>
 
             <div class="mt-6">
-                <h4 class="mb-2 font-medium text-gray-700 text-sm md:text-base">Live Transcript</h4>
+                <h4 class="mb-2 font-medium text-gray-700 text-sm md:text-base">Live Output</h4>
                 <pre id="transcript"
                     class="bg-gray-900 p-4 rounded-lg max-h-60 md:max-h-72 overflow-y-auto font-mono text-green-300 text-sm"></pre>
             </div>
@@ -82,7 +83,6 @@
         const transcriptEl = document.getElementById('transcript');
         const downloadBtn = document.getElementById('downloadBtn');
 
-        // --- Utility Functions ---
         function resetUI() {
             selectedFile = null;
             currentTaskId = null;
@@ -90,10 +90,11 @@
             fileInput.value = '';
             youtubeInput.value = '';
             uploadBtn.disabled = true;
+            youtubeUploadBtn.disabled = false;
             progressBar.style.width = '0%';
             progressLabel.textContent = '0%';
             statusLabel.textContent = 'idle';
-            stageText.textContent = 'Idle';
+            stageText.textContent = 'Waiting for input';
             transcriptEl.textContent = '';
             downloadBtn.classList.add('hidden');
             downloadBtn.href = '#';
@@ -108,10 +109,9 @@
         function selectFile(file) {
             selectedFile = file;
             uploadBtn.disabled = false;
-            stageText.textContent = `Ready: ${file.name}`;
+            stageText.textContent = `File ready: ${file.name}`;
         }
 
-        // --- Drag & Drop ---
         dropZone.addEventListener('click', () => fileInput.click());
         dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drop-active'); });
         dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('drop-active'); });
@@ -125,7 +125,6 @@
         fileInput.addEventListener('change', e => { const f = e.target.files[0]; if (f) selectFile(f); });
         clearBtn.addEventListener('click', resetUI);
 
-        // --- File Upload ---
         uploadBtn.addEventListener('click', () => {
             if (!selectedFile || processing) return;
             processing = true;
@@ -139,31 +138,30 @@
                 .then(res => {
                     if (res.task_id) {
                         currentTaskId = res.task_id;
-                        setProgress(0, 'Processing started');
+                        setProgress(0, 'Task started');
                         stageText.textContent = 'Processing...';
                         transcriptEl.textContent = '';
                     } else {
-                        setProgress(0, 'Upload failed: ' + (res.error || 'Unknown'));
+                        setProgress(0, 'Failed to start task: ' + (res.error || 'Unknown'));
                         processing = false;
                         uploadBtn.disabled = false;
                     }
                 })
                 .catch(err => {
                     console.error('[Upload Error]', err);
-                    setProgress(0, 'Upload error: ' + err.message);
+                    setProgress(0, 'An error occurred');
                     processing = false;
                     uploadBtn.disabled = false;
                 });
         });
 
-        // --- YouTube Upload ---
         youtubeUploadBtn.addEventListener('click', () => {
             const url = youtubeInput.value.trim();
             if (!url || processing) return;
 
             processing = true;
             youtubeUploadBtn.disabled = true;
-            setProgress(0, 'Downloading YouTube audio...');
+            setProgress(0, 'Starting task...');
 
             const formData = new FormData();
             formData.append('youtube_url', url);
@@ -173,18 +171,18 @@
                 .then(res => {
                     if (res.task_id) {
                         currentTaskId = res.task_id;
-                        setProgress(0, 'Processing started');
-                        stageText.textContent = 'Processing YouTube audio...';
+                        setProgress(0, 'Task started');
+                        stageText.textContent = 'Processing...';
                         transcriptEl.textContent = '';
                     } else {
-                        setProgress(0, 'YouTube upload failed: ' + (res.error || 'Unknown'));
+                        setProgress(0, 'Failed to start task: ' + (res.error || 'Unknown'));
                         processing = false;
                         youtubeUploadBtn.disabled = false;
                     }
                 })
                 .catch(err => {
                     console.error('[YouTube Upload Error]', err);
-                    setProgress(0, 'Upload error: ' + err.message);
+                    setProgress(0, 'An error occurred');
                     processing = false;
                     youtubeUploadBtn.disabled = false;
                 });
@@ -194,48 +192,22 @@
             if (!currentTaskId || data.task_id !== currentTaskId) return;
             const pct = Math.min(100, data.percent || 0);
 
-            // Update progress bar & stage
-            setProgress(pct, `${data.stage}: ${data.message}`);
-            stageText.textContent = `${data.stage} — ${data.message}`;
+            setProgress(pct, data.message || 'Working...');
+            stageText.textContent = data.message || 'Processing...';
 
-            // Append live transcript
             if (data.text_chunk) {
                 transcriptEl.innerText += data.text_chunk + "\n\n";
                 transcriptEl.scrollTop = transcriptEl.scrollHeight;
             }
 
-            // When finished
             if (["done", "finished", "download"].includes(data.stage) || pct >= 100) {
-                setProgress(100, 'Completed');
+                setProgress(100, 'Task completed');
 
-                // Transcript download button
                 if (data.download_url) {
                     downloadBtn.classList.remove('hidden');
                     downloadBtn.href = data.download_url;
                 }
 
-                // Article view/download button
-                let articleBtn = document.getElementById('articleBtn');
-                if (!articleBtn) {
-                    articleBtn = document.createElement('a');
-                    articleBtn.id = 'articleBtn';
-                    articleBtn.className = 'bg-indigo-600 text-white px-3 py-2 rounded-lg hover:bg-indigo-700 transition duration-200 ml-2';
-                    articleBtn.target = '_blank';
-                    articleBtn.textContent = 'View Article';
-                    downloadBtn.insertAdjacentElement('afterend', articleBtn);
-                }
-
-                if (data.article_url) {
-                    articleBtn.href = data.article_url;
-                    articleBtn.classList.remove('hidden');
-                    articleBtn.textContent = 'View Article';
-                } else {
-                    articleBtn.href = '#';
-                    articleBtn.classList.remove('hidden');
-                    articleBtn.textContent = 'Article unavailable';
-                }
-
-                // Reset flags
                 processing = false;
                 uploadBtn.disabled = false;
                 youtubeUploadBtn.disabled = false;

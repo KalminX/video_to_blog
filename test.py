@@ -1,30 +1,65 @@
-# test.py
-import sys
+#!/usr/bin/env python3
+import json
+import subprocess
 from pathlib import Path
-from transcribe import process_audio_task  # replace with your script filename
 
-def emit_fn(task_id, stage, message, percent, text_chunk=None):
-    print(f"[{task_id}] {stage} — {percent}% — {message}")
-    if text_chunk:
-        print(f"Text chunk: {text_chunk[:50]}...")  # first 50 chars
+def extract_metadata_ffmpeg(file_path: str) -> dict:
+    """
+    Extract metadata using ffprobe.
+    """
+    cmd = [
+        "ffprobe",
+        "-v", "quiet",
+        "-print_format", "json",
+        "-show_format",
+        "-show_streams",
+        file_path
+    ]
+    res = subprocess.run(cmd, capture_output=True, text=True)
+    if res.returncode != 0:
+        raise RuntimeError(f"ffprobe failed: {res.stderr}")
+
+    info = json.loads(res.stdout)
+    fmt = info.get("format", {})
+    streams = info.get("streams", [])
+
+    video_stream = next((s for s in streams if s.get("codec_type") == "video"), {})
+    audio_stream = next((s for s in streams if s.get("codec_type") == "audio"), {})
+
+    return {
+        "filename": fmt.get("filename"),
+        "duration": float(fmt.get("duration", 0)),
+        "size": int(fmt.get("size", 0)),
+        "bit_rate": int(fmt.get("bit_rate", 0)) if fmt.get("bit_rate") else None,
+        "video_codec": video_stream.get("codec_name"),
+        "width": video_stream.get("width"),
+        "height": video_stream.get("height"),
+        "fps": eval(video_stream.get("r_frame_rate", "0")) if video_stream.get("r_frame_rate") else None,
+        "audio_codec": audio_stream.get("codec_name"),
+        "channels": audio_stream.get("channels"),
+        "sample_rate": audio_stream.get("sample_rate")
+    }
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python3 test.py <video_file>")
-        sys.exit(1)
+    # === CONFIG ===
+    max_duration = 70  # seconds, change as needed
+    video_file = input("Enter path to video file: ").strip()
+    path = Path(video_file)
 
-    video_file = sys.argv[1]
-    test_video = Path(video_file)
-    if not test_video.exists():
-        print(f"File not found: {test_video}")
-        sys.exit(1)
+    if not path.exists() or not path.is_file():
+        print(f"Error: File {video_file} does not exist")
+        exit(1)
 
-    task_id = "video_cli"
+    try:
+        metadata = extract_metadata_ffmpeg(str(path))
+        duration = metadata.get("duration", 0)
 
-    out_path, full_text = process_audio_task(task_id, test_video, emit_fn)
+        if duration <= 0:
+            print("Error: Could not determine video duration")
+        elif duration > max_duration:
+            print(f"Video too long: {duration:.2f}s (max allowed: {max_duration}s)")
+        else:
+            print(f"Video duration OK: {duration:.2f}s (max allowed: {max_duration}s)")
 
-    if out_path:
-        print(f"\nFull transcript saved at: {out_path}")
-        print(f"Full text preview:\n{full_text[:500]}")  # show first 500 chars
-    else:
-        print("Transcription failed.")
+    except Exception as e:
+        print(f"Error checking video: {e}")

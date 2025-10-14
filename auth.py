@@ -75,6 +75,6 @@ def init_auth(app):
     @login_required
     def logout():
         logout_user()
-        return redirect(url_for("index"))
+        return redirect(url_for("landing_page"))
 
     return login_manager, oauth, google
