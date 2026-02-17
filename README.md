@@ -1,99 +1,87 @@
 # Vidlogue
 
-Vidlogue is a web application built for content creators who publish YouTube Shorts, TikToks, or Instagram Reels and want to turn short-form videos into long-form, SEO-ready blog content.
+Vidlogue is a content repurposing platform designed for creators who publish short-form videos (YouTube Shorts, TikTok, Instagram Reels) and want to convert them into structured, SEO-friendly long-form blog posts.
 
-Every short video can become a searchable, detailed article.
+Short videos generate attention.
+Long-form content builds authority.
 
----
-
-## 🚀 The Problem
-
-Short-form videos:
-- Have limited SEO value
-- Disappear quickly in feeds
-- Are hard to repurpose manually
-
-Long-form blog posts:
-- Rank on search engines
-- Build authority
-- Drive long-term traffic
-
-Vidlogue connects both worlds.
+Vidlogue connects both.
 
 ---
 
-## 🧠 How It Works
+## 🚀 How It Works
 
 ### 1️⃣ Upload Your Video
 
-Upload your short-form video directly to the platform.
+Upload your short-form video directly into the platform.
 
-![Upload Video Screenshot](./screenshots/upload.png)
+![Upload Interface](./vidlogue_assets/pics/upload.jpeg)
 
----
-
-### 2️⃣ Real-Time Transcription
-
-Vidlogue:
-- Extracts the audio
-- Transcribes in real time
-- Shows processing progress
-- Allows transcript download
-
-![Transcription Progress Screenshot](./screenshots/transcription.png)
+The system prepares your file for processing immediately.
 
 ---
 
-### 3️⃣ Blog Post Generation
+### 2️⃣ Processing & Transcription
 
-The transcript is:
-- Cleaned
-- Structured
-- Formatted into a readable blog post
-- Ready for publishing
+Vidlogue extracts the audio and performs real-time transcription while showing progress updates.
 
-You can download it as a Markdown file for use on:
-- Personal blogs
-- Medium
-- Dev.to
-- Hashnode
-- Any CMS
+![Processing Screen](./vidlogue_assets/pics/processing.jpeg)
 
-![Generated Blog Screenshot](./screenshots/blog.png)
+You can monitor the status as your video is being transformed into text.
 
 ---
 
-### 4️⃣ Transcript Download
+### 3️⃣ Completed Generation
 
-Need just the transcript?
+Once processing is finished, your generated content becomes available.
 
-Vidlogue doubles as a transcript generator.
+![Completed View](./vidlogue_assets/pics/completed.jpeg)
 
-Download the raw or formatted transcript instantly.
+From here, you can:
+- View the transcript
+- Access the formatted blog
+- Download your content
 
-![Transcript Download Screenshot](./screenshots/transcript.png)
+---
+
+### 4️⃣ Blog Output Example
+
+Vidlogue does more than produce raw transcripts.
+
+It:
+- Cleans the transcript
+- Structures it into readable sections
+- Formats it as a blog post
+- Makes it ready for publishing
+
+![Example Blog](./vidlogue_assets/pics/example_blog.jpeg)
+
+You can export the final version as Markdown for use on any blogging platform.
 
 ---
 
 ### 5️⃣ Dashboard Overview
 
-From your dashboard, you can:
-- View uploaded videos
-- Track processing status
-- Access generated blogs
-- Manage credits
+Your dashboard provides a centralized view of:
 
-![Dashboard Screenshot](./screenshots/dashboard.png)
+- Uploaded videos
+- Processing status
+- Generated blogs
+- Credit usage
+
+![Dashboard](./vidlogue_assets/pics/dashboard.jpeg)
 
 ---
 
-## 💳 Credit System
+### 6️⃣ Credit System
 
-Vidlogue operates on a simple credit-based system:
+Vidlogue uses a credit-based model:
 
 - 1 minute of video = 1 credit
-- New users receive 5 free credits
+- New users receive starter credits
 - Additional credits can be purchased
+
+![Credits Page](./vidlogue_assets/pics/credits_page.jpeg)
 
 This ensures fair and scalable usage.
 
@@ -105,8 +93,8 @@ This ensures fair and scalable usage.
 - TikTok creators  
 - Instagram Reels creators  
 - Educators  
-- Indie builders  
 - Technical content creators  
+- Indie builders  
 
 ---
 
@@ -114,30 +102,23 @@ This ensures fair and scalable usage.
 
 - Video upload
 - Real-time transcription
-- Blog post generation
+- Automated blog post generation
 - Markdown export
 - Transcript download
-- Credit tracking system
-- User dashboard
+- Credit management dashboard
 
 ---
 
-## 📌 Future Improvements
+## 💡 Vision
 
-- SEO keyword suggestions
-- Tone/style customization
-- Multi-language support
-- Direct publishing integrations
-- AI-generated cover images
-- Internal linking suggestions
+Every short video can become a long-form asset.
+
+Vidlogue helps creators extract more value from the content they already produce — without rewriting everything manually.
 
 ---
 
 ## 📣 Feedback
 
-This project was built for creators who want to maximize the value of their content.
+Suggestions, improvements, and feature ideas are welcome.
 
-If you have ideas, feature suggestions, or workflow improvements,
-open an issue or reach out.
-
-Let’s make content repurposing frictionless.
+Let’s make content repurposing smarter.
